@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+    <link rel="styles" href="style.css"/>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    
+</head>
+
+<body>
+    <div class="topSection text-center">
+        <h1 class="heading">Library<br />Management</h1>
+        <input id="searchInput" type="search" placeholder="Type book title" />
+    </div>
+    <div id="searchResults" class="row">
+        <h1 id="heading"></h1>
+        <div class="d-none" id="spinner">
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let inputEl = document.getElementById("searchInput");
+let bottomContainerEl = document.getElementById("searchResults");
+let spinnerEl = document.getElementById("spinner");
+
+
+
+
+function createAndAppendSearchResult(book) {
+    let {
+        author,
+        imageLink,
+        title
+    } = book;
+
+    let firstDivEl = document.createElement("div");
+    firstDivEl.classList.add("cols-6");
+    let imageEl = document.createElement("img");
+    imageEl.src = imageLink;
+    firstDivEl.appendChild(imageEl);
+    let nameEl = document.createElement("p");
+    nameEl.textContent = author;
+    firstDivEl.appendChild(nameEl);
+    bottomContainerEl.appendChild(firstDivEl);
+
+}
+
+
+
+
+function displayResults(searchResults) {
+    spinnerEl.classList.add("d-none");
+    let headingEl = document.getElementById("heading");
+    headingEl.textContent = "Popular Books";
+    headingEl.classList.add("popular");
+    bottomContainerEl.appendChild(headingEl);
+    for (let book of searchResults) {
+        createAndAppendSearchResult(book);
+    }
+}
+
+
+
+
+function GetBooks() {
+
+    let url = "https://apis.ccbp.in/book-store?title=" + inputEl.value;
+    let options = {
+        method: "GET"
+    };
+
+    fetch(url, options)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(jsonData) {
+            let {
+                search_results
+            } = jsonData;
+            console.log(search_results);
+            if (search_results.length === 0) {
+                let headEl = document.getElementById("heading");
+                spinnerEl.classList.add("d-none");
+                headEl.textContent = "No results found";
+            } else {
+                displayResults(search_results);
+            }
+        });
+}
+
+
+
+function Search(event) {
+
+    if (event.key === "Enter") {
+        spinnerEl.classList.remove("d-none");
+        GetBooks();
+    }
+}
+
+
+inputEl.addEventListener("keydown", Search);
+    </script>
+</body>
+
+</html>
